@@ -55,5 +55,5 @@ def createCompletedTransactionLog(request: models.Request):
 def saveTransaction(transaction: models.Transaction):
     return
 
-def returnResult():
+def returnResult(transaction: models.Transaction):
     return

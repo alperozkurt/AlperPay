@@ -148,6 +148,7 @@ activemq-data/
 *.sage.py
 
 # Environments
+.vscode
 .env
 .envrc
 .venv
@@ -216,3 +217,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Docker
+docker-compose.yml
+
+# SQL
+/sql
