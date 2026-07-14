@@ -24,8 +24,8 @@ class Transaction:
     transaction_id: int
     sender: Wallet
     receiver: Wallet
-    status: enums.TransactionStatus 
     amount: int
+    status: enums.TransactionStatus
     payment_channel: enums.PaymentChannel
     @property
     def currency(self):

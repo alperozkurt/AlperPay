@@ -10,9 +10,11 @@ def sendPayment(sender: models.Wallet, receiver: models.Wallet, amount):
     if validationResult.valid:
         transferFunds(request)
         
-        recordTransaction()
+        transaction = createCompletedTransactionLog(request)
         
-        returnResult()
+        saveTransaction(transaction)
+        
+        returnResult(transaction)
         
     else:
         return validationResult.error
@@ -41,8 +43,17 @@ def transferFunds(request: models.Request):
     request.sender.balance -= request.amount
     request.receiver.balance += request.amount
     
-def recordTransaction():
-    return    
+def createCompletedTransactionLog(request: models.Request):
+    return models.Transaction(
+        transaction_id=1,
+        sender=request.sender,
+        receiver=request.receiver,
+        amount=request.amount,
+        status=enums.TransactionStatus.COMPLETED,
+        payment_channel=enums.PaymentChannel.WALLET)
+
+def saveTransaction(transaction: models.Transaction):
+    return
 
 def returnResult():
     return
