@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, Enum, Integer, String, Identity, ForeignKey
+from helpers import generate_wallet_code
 import enums
     
 class User(Base):
@@ -51,6 +52,13 @@ class Wallet(Base):
         Integer,
         Identity(start=1),
         primary_key=True
+    )
+    
+    identifier: Mapped[str] = mapped_column(
+        String(8),
+        unique=True,
+        nullable=False,
+        default=generate_wallet_code()
     )
     
     owner_id: Mapped[int] = mapped_column(

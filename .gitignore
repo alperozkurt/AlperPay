@@ -223,8 +223,9 @@ docker-compose.yml
 
 # Database
 /sql
-/migrations
+app/migrations
 alembic.ini
 
 # Tests
 /tests
+test*.py
