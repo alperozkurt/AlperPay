@@ -84,7 +84,6 @@ class Wallet(Base):
         nullable=False
     )
     
-   
 class Transaction(Base):
     __tablename__ = "transactions"
     
@@ -141,8 +140,7 @@ class Transaction(Base):
         default=datetime.now,
         nullable=False
     )
-    
-    
+     
 @dataclass
 class ValidationResult:
     error: enums.TransactionErrors = enums.TransactionErrors.NONE
