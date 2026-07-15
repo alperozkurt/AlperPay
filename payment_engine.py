@@ -1,20 +1,25 @@
 import models,enums
+from database import SessionLocal
 
+session = SessionLocal()
     
-def sendPayment(sender: models.Wallet, receiver: models.Wallet, amount):
+def sendPayment(sender_id: int, receiver_id: int, amount):
     
-    request = models.Request(sender,receiver,amount)
+    sender_wallet = session.query(models.Wallet).get(sender_id)
+    receiver_wallet = session.query(models.Wallet).get(receiver_id)
+    if sender_wallet == None or receiver_wallet == None: return
+
+    request = models.Request(
+        sender_wallet,
+        receiver_wallet,
+        amount)
     
     validationResult = validateRequest(request)
     
     if validationResult.valid:
         transferFunds(request)
         
-        transaction = createCompletedTransactionLog(request)
-        
-        saveTransaction(transaction)
-        
-        returnResult(transaction)
+        createCompletedTransactionLog(request)
         
     else:
         return validationResult.error
@@ -44,16 +49,13 @@ def transferFunds(request: models.Request):
     request.receiver.balance += request.amount
     
 def createCompletedTransactionLog(request: models.Request):
-    return models.Transaction(
-        transaction_id=1,
+    transaction = models.Transaction(
         sender=request.sender,
         receiver=request.receiver,
         amount=request.amount,
+        currency=request.sender.currency,
         status=enums.TransactionStatus.COMPLETED,
         payment_channel=enums.PaymentChannel.WALLET)
-
-def saveTransaction(transaction: models.Transaction):
-    return
-
-def returnResult(transaction: models.Transaction):
-    return
+    session.add(transaction)
+    session.commit()
+    session.close()
