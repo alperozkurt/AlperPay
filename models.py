@@ -1,5 +1,6 @@
+from __future__ import annotations
 from datetime import datetime
-from dataclasses import dataclass, field
+from dataclasses import dataclass   
 from database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, Enum, Integer, String, Identity, ForeignKey
@@ -16,6 +17,12 @@ class User(Base):
     
     username: Mapped[str] = mapped_column(
         String(50),
+        nullable=True,
+        unique=True
+    )
+    
+    email: Mapped[str] = mapped_column(
+        String(50),
         nullable=False,
         unique=True
     )
@@ -27,7 +34,8 @@ class User(Base):
     )
     
     wallets: Mapped[list[Wallet]] = relationship(
-        back_populates="owner"
+        back_populates="owner",
+        cascade="all, delete-orphan"
     )
     
     created_at: Mapped[datetime] = mapped_column(
@@ -76,19 +84,63 @@ class Wallet(Base):
         nullable=False
     )
     
-
-@dataclass     
-class Transaction:
-    transaction_id: int
-    sender: Wallet
-    receiver: Wallet
-    amount: int
-    status: enums.TransactionStatus
-    payment_channel: enums.PaymentChannel
-    @property
-    def currency(self):
-        return self.sender.currency
-    timestamp: datetime = field(default_factory=datetime.now) 
+   
+class Transaction(Base):
+    __tablename__ = "transactions"
+    
+    transaction_id: Mapped[int] = mapped_column(
+        Integer,
+        Identity(start=1),
+        primary_key=True
+    )
+    
+    sender_wallet_id: Mapped[int] = mapped_column(
+        ForeignKey("wallets.wallet_id"),
+        nullable=False
+    )
+    
+    sender: Mapped[Wallet] = relationship(
+        "Wallet",
+        foreign_keys=[sender_wallet_id]
+    )
+    
+    receiver_wallet_id: Mapped[int] = mapped_column(
+        ForeignKey("wallets.wallet_id"),
+        nullable=False
+    )
+    
+    receiver: Mapped[Wallet] = relationship(
+        "Wallet",
+        foreign_keys=[receiver_wallet_id]
+    )
+    
+    amount: Mapped[int] = mapped_column(
+        Integer,
+        nullable=False
+    )
+    
+    status: Mapped[enums.TransactionStatus] = mapped_column(
+        Enum(enums.TransactionStatus),
+        default=enums.TransactionStatus.COMPLETED,
+        nullable=False
+    )
+    
+    payment_channel: Mapped[enums.PaymentChannel] = mapped_column(
+        Enum(enums.PaymentChannel),
+        default=enums.PaymentChannel.WALLET,
+        nullable=False
+    )
+    
+    currency: Mapped[enums.Currency] = mapped_column(
+        Enum(enums.Currency),
+        nullable=False
+    )
+    
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime,
+        default=datetime.now,
+        nullable=False
+    )
     
     
 @dataclass

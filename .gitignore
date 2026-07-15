@@ -221,5 +221,10 @@ __marimo__/
 # Docker
 docker-compose.yml
 
-# SQL
+# Database
 /sql
+/migrations
+alembic.ini
+
+# Tests
+test_*
