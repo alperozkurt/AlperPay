@@ -1,11 +1,11 @@
 from __future__ import annotations
 from datetime import datetime
 from dataclasses import dataclass   
-from database import Base
+from app.database import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, Enum, Integer, String, Identity, ForeignKey
-from helpers import generate_wallet_code
-import enums
+from app.enums import UserStatus, Currency, WalletStatus, TransactionStatus, PaymentChannel, TransactionErrors
+
     
 class User(Base):
     __tablename__ = "users"
@@ -18,7 +18,7 @@ class User(Base):
     
     username: Mapped[str] = mapped_column(
         String(50),
-        nullable=True,
+        nullable=False,
         unique=True
     )
     
@@ -28,9 +28,9 @@ class User(Base):
         unique=True
     )
     
-    status: Mapped[enums.UserStatus] = mapped_column(
-        Enum(enums.UserStatus),
-        default=enums.UserStatus.ACTIVE,
+    status: Mapped[UserStatus] = mapped_column(
+        Enum(UserStatus),
+        default=UserStatus.ACTIVE,
         nullable=False
     )
     
@@ -58,7 +58,6 @@ class Wallet(Base):
         String(8),
         unique=True,
         nullable=False,
-        default=generate_wallet_code()
     )
     
     owner_id: Mapped[int] = mapped_column(
@@ -70,19 +69,20 @@ class Wallet(Base):
         back_populates="wallets"
     ) 
     
-    currency: Mapped[enums.Currency] = mapped_column(
-        Enum(enums.Currency),
+    currency: Mapped[Currency] = mapped_column(
+        Enum(Currency),
         nullable=False
     )
     
     balance: Mapped[int] = mapped_column(
         Integer,
-        nullable=False
+        nullable=False,
+        default=0
     )
     
-    status: Mapped[enums.WalletStatus] = mapped_column(
-        Enum(enums.WalletStatus),
-        default=enums.WalletStatus.ACTIVE,
+    status: Mapped[WalletStatus] = mapped_column(
+        Enum(WalletStatus),
+        default=WalletStatus.ACTIVE,
         nullable=False
     )
     
@@ -126,20 +126,20 @@ class Transaction(Base):
         nullable=False
     )
     
-    status: Mapped[enums.TransactionStatus] = mapped_column(
-        Enum(enums.TransactionStatus),
-        default=enums.TransactionStatus.COMPLETED,
+    status: Mapped[TransactionStatus] = mapped_column(
+        Enum(TransactionStatus),
+        default=TransactionStatus.COMPLETED,
         nullable=False
     )
     
-    payment_channel: Mapped[enums.PaymentChannel] = mapped_column(
-        Enum(enums.PaymentChannel),
-        default=enums.PaymentChannel.WALLET,
+    payment_channel: Mapped[PaymentChannel] = mapped_column(
+        Enum(PaymentChannel),
+        default=PaymentChannel.WALLET,
         nullable=False
     )
     
-    currency: Mapped[enums.Currency] = mapped_column(
-        Enum(enums.Currency),
+    currency: Mapped[Currency] = mapped_column(
+        Enum(Currency),
         nullable=False
     )
     
@@ -151,10 +151,10 @@ class Transaction(Base):
      
 @dataclass
 class ValidationResult:
-    error: enums.TransactionErrors = enums.TransactionErrors.NONE
+    error: TransactionErrors = TransactionErrors.NONE
     @property
     def valid(self):
-        return self.error == enums.TransactionErrors.NONE # If no error return true
+        return self.error == TransactionErrors.NONE # If no error return true
     
 @dataclass
 class Request:

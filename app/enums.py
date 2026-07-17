@@ -33,6 +33,7 @@ class TransactionStatus(Enum):
     REFUNDED = "Refunded"
     
 class TransactionErrors(Enum):
+    SUCCESS = "Success"
     NONE = "No error."
     FAILED = "Transaction failed."
     FUNDS = "Not enough funds."
@@ -40,6 +41,7 @@ class TransactionErrors(Enum):
     WALLET_EXIST = "Wallet does not exist."
     WALLET_NOT_ACTIVE = "Wallet is not active."
     USER_NOT_ACTIVE = "User is not active."
+    INVALID_AMOUNT = "Invalid amount."
     
 class PaymentChannel(Enum):
     WALLET = "Wallet number"
